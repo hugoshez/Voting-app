@@ -1,0 +1,32 @@
+name: Docker CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt update
+          sudo apt install -y gh
+          gh --version
+
+      - name: Login to Docker Hub
+        run: echo " dckr_pat_TQVstJ3l78HomWuhtIw2PjqGbIo " | docker login -u "hugoshez" --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t hugoshez/mon-image:latest .
+
+      - name: Run Docker Scout Analysis
+        run: docker scout cves hugoshez/mon-image:latest
+
+      - name: Push Docker image to Docker Hub
+        run: docker push hugoshez/mon-image:latest
